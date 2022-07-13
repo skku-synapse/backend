@@ -127,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+cs_flow/*
+cflow/*
+fastflow/*
+patchcore_inspection/*
+patchcore_model/*
+freia_funcs.py
+
+*.jpg
