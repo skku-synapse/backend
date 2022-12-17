@@ -170,7 +170,7 @@ def evaluate_function(img_path, model_name="SMT", threshold=1.192936):
     # default threshold: SMT 기준
     # dataset에 따라 threshold 지정 후 evaluate
 
-    if model_name == "camera_lens":
+    if model_name == "lens":
         threshold = 3.077919
     elif model_name == "flex":
         threshold = 1.5589128

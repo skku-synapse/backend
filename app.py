@@ -10,11 +10,7 @@ from flask import Flask, make_response, request, jsonify, send_file
 from flask_cors import CORS, cross_origin
 import torch
 
-import timm
-from timm.data import resolve_data_config
 from cs_flow.evaluate_one import evaluate_function, compare_histogram
-
-from setproctitle import *
 
 api = Flask(__name__)
 CORS(api, support_credentials=True)
@@ -91,7 +87,7 @@ def getHistogram():
 @api.route('/predict', methods=['GET'])
 def predict():
 
-    # arguments( 모델 이름(CS-Flow), 데이터셋 종류, 이미지 이름)
+    # arguments(모델 이름(CS-Flow), 데이터셋 종류, 이미지 이름)
     model = request.args.get('model')
     dataset = request.args.get('dataset')  # module / lens / flex
     img_name = request.args.get('img_name')
@@ -103,7 +99,7 @@ def predict():
         if dataset == "module":
             response = evaluate_function(user_img_path)
         elif dataset == "lens":
-            response = evaluate_function(user_img_path, "camera_lens")
+            response = evaluate_function(user_img_path, "lens")
         elif dataset == "flex":
             response = evaluate_function(user_img_path, "flex")
         else:
