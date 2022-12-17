@@ -40,6 +40,7 @@ def concat_maps(maps):
         flat_maps.append(flat(m))
     return torch.cat(flat_maps, dim=1)[..., None]
 
+# localization을 위한 이미지 생성 함수
 def viz_maps(img_path, z, name, model_name):
     map_export_dir = join('/home/synapse/simulator/backend/static/test_map', "")
     os.makedirs(map_export_dir, exist_ok=True)
@@ -51,7 +52,6 @@ def viz_maps(img_path, z, name, model_name):
     likelihood_grouped = list()
     all_maps = list()
     for i in range(len(z)):
-        #print(len(z))
         z_grouped.append(z[i].view(-1, *z[i].shape[1:]))
         likelihood_grouped.append(torch.mean(z_grouped[-1] ** 2, dim=(1,)) / N_FEAT)    
 
@@ -59,6 +59,7 @@ def viz_maps(img_path, z, name, model_name):
     map_to_viz = t2np(F.interpolate(all_maps[0][None, None], size=image.shape[:2], mode=upscale_mode, align_corners=False))[
         0, 0]
 
+    # 원본 이미지, 히트맵 이미지, 원본+히트맵 overlay 이미지를 각각 저장
     plt.clf()
     plt.imshow(map_to_viz)
     plt.axis('off')
@@ -72,12 +73,12 @@ def viz_maps(img_path, z, name, model_name):
     plt.savefig(join(map_export_dir, 'overlay.jpg'), bbox_inches='tight', pad_inches=0)
     return
 
+# score histogram 생성 함수
+# thresh : 최대 score 값 ( x축 )
 def compare_histogram(scores, classes, dataset, thresh=7, n_bins=32):
     classes = deepcopy(classes)
     scores = deepcopy(scores)
     scores = [thresh if x > thresh else x for x in scores]
-    #print(scores)
-    #scores[scores > thresh] = thresh
     bins = np.linspace(np.min(scores), np.max(scores), n_bins)
 
     scores_norm = []
@@ -96,14 +97,9 @@ def compare_histogram(scores, classes, dataset, thresh=7, n_bins=32):
     ax.set_facecolor("#1e1e1e")
     ax.tick_params(axis='x', colors='white', labelsize=15)
     ax.tick_params(axis='y', colors='white', labelsize=15)
-    #plt.figure(facecolor="#1e1e1e")
     
     plt.hist(scores_norm, bins, alpha=0.5, label='non-defects', color='cyan', edgecolor="#1e1e1e")
     plt.hist(scores_ano, bins, alpha=0.5, label='defects', color='crimson', edgecolor="#1e1e1e")
-    #plt.style.use('dark_background')
-
-    #if dataset == "lens":
-    #    plt.vlines(1.4644676, 0, 30,color="red")
 
     ticks = np.linspace(0.5, thresh, 5)
     labels = [str(i) for i in ticks[:-1]] + ['>' + str(thresh)]
@@ -118,7 +114,8 @@ def compare_histogram(scores, classes, dataset, thresh=7, n_bins=32):
     plt.savefig(join(score_export_dir, dataset + '.png'), bbox_inches='tight', pad_inches=0)
     plt.close()
 
-def evaluate_one(model, img_path, model_name="camera_cropped", threshold=0.6938925385475159):
+# 하나의 이미지 양/불량 판단 함수
+def evaluate_one(model, img_path, model_name="SMT", threshold=1.192936):
     model.to(DEVICE)
     model.eval()
 
@@ -131,7 +128,7 @@ def evaluate_one(model, img_path, model_name="camera_cropped", threshold=0.69389
 
     
     img = Image.open(img_path)
-    # transform = transforms.Resize(IMG_SIZE)
+
     start = time.time()
     tfs = [transforms.Resize(IMG_SIZE), transforms.ToTensor(), transforms.Normalize(NORM_MEAN, NORM_STD)]
     transform = transforms.Compose(tfs)
@@ -155,8 +152,7 @@ def evaluate_one(model, img_path, model_name="camera_cropped", threshold=0.69389
     
     viz_maps(img_path, z, "test_img", model_name)
 
-    print(nll_score)
-
+    # anomaly score, 양/불량 여부, 예측 시간을 반환
     result = {
         "anomaly_score" : float(nll_score[0]),
         "isAnomaly" : bool(nll_score[0] > threshold),
@@ -165,10 +161,17 @@ def evaluate_one(model, img_path, model_name="camera_cropped", threshold=0.69389
 
     return result
 
-def evaluate_function(img_path, model_name="SMT", threshold=1.192936): # 0.16
+
+def evaluate_function(img_path, model_name="SMT", threshold=1.192936):
+
+    # 데이터셋에 따른 모델 로드
     mod = load_model(model_name)
+
+    # default threshold: SMT 기준
+    # dataset에 따라 threshold 지정 후 evaluate
+
     if model_name == "camera_lens":
-        threshold = 3.077919 # 0.0 std
-    elif model_name == "board":
-        threshold = 1.5589128 # 0.5
+        threshold = 3.077919
+    elif model_name == "flex":
+        threshold = 1.5589128
     return evaluate_one(mod, img_path, model_name, threshold)
