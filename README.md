@@ -7,13 +7,24 @@
 
 `Flask`
 
-## Installation
+## Getting Started
+
+### Clone Repository
+
+```
+$ git clone https://github.com/skku-synapse/backend.git
+$ cd backend
+```
+
+### How to Run
+
+**Installation:**
 
 ```
 $ pip install -r requirements.txt
 ```
 
-## Run Flask
+**To run Flask:**
 
 ```
 $ python app.py
@@ -48,6 +59,7 @@ $ python app.py
 └── freia_funcs.py
 ```
 
+- 모든 api는 app.py에 정의되어 있음.
 - 각 모델은 cs_flow/models에 데이터셋 이름으로 저장해야 하며, 시뮬레이션 실행 시에 로드됨.
 - evaluate 시에 생성되는 visualization, histogram 이미지는 static 디렉토리의 각 폴더에 저장됨.
 - 데이터셋별 이미지는 static/데이터셋 디렉토리에 OK와 NG를 나누어 저장함.
@@ -59,8 +71,15 @@ $ python app.py
 ### 1) /getAllData [GET]
 
 arguments: dataset(데이터셋 종류)
-
 static/dataset에 있는 모든 데이터의 리스트를 랜덤으로 순서를 섞어 배열로 반환
+
+**Response 예시**
+
+```
+{
+    list: [OK/image1.jpg, NG/image3.jpg, OK/image2.jpg]
+}
+```
 
 ### 2) /predict [GET]
 
@@ -69,8 +88,28 @@ arguments: model(모델 종류, CS-Flow로 고정), dataset(데이터셋 종류)
 선택된 데이터셋의 모델을 cs_flow/models에서 불러오고, img_name에 해당하는 이미지에 대해 찾아 양/불량을 판단
 이미지 실제 label, 예측 결과, 원본 이미지, visualization 이미지를 반환
 
+**Response 예시**
+
+```
+{
+    label: "OK",
+    isAnomaly: false,
+    image: 원본 이미지,
+    overlay: visualization 이미지
+}
+```
+
 ### 3) /getHistogram [GET]
 
 arguments: dataset(데이터셋 종류)
 
 예측이 진행된 모든 데이터의 score를 이용해 histogram을 생성하고, 이를 반환
+
+**Response 예시**
+
+```
+{
+    status: true,
+    image: 히스토그램 이미지
+}
+```
