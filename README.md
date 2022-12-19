@@ -71,6 +71,7 @@ $ python app.py
 ### 1) /getAllData [GET]
 
 arguments: dataset(데이터셋 종류)
+
 static/dataset에 있는 모든 데이터의 리스트를 랜덤으로 순서를 섞어 배열로 반환
 
 **Response 예시**
@@ -85,7 +86,7 @@ static/dataset에 있는 모든 데이터의 리스트를 랜덤으로 순서를
 
 arguments: model(모델 종류, CS-Flow로 고정), dataset(데이터셋 종류), img_name(이미지 이름)
 
-선택된 데이터셋의 모델을 cs_flow/models에서 불러오고, img_name에 해당하는 이미지에 대해 찾아 양/불량을 판단
+선택된 데이터셋의 모델을 cs_flow/models에서 불러오고, img_name에 해당하는 이미지에 대해 양/불량을 판단  
 이미지 실제 label, 예측 결과, 원본 이미지, visualization 이미지를 반환
 
 **Response 예시**
