@@ -21,6 +21,7 @@ $ cd backend
 **Installation:**
 
 ```
+$ python -m pip install -U pip
 $ pip install -r requirements.txt
 ```
 
@@ -29,8 +30,6 @@ $ pip install -r requirements.txt
 ```
 $ python app.py
 ```
-
-기본 사용 포트: 51122
 
 ## 파일 구조
 
@@ -70,9 +69,25 @@ $ python app.py
 
 ### 1) /getAllData [GET]
 
+static/dataset에 있는 모든 데이터의 리스트를 랜덤으로 순서를 섞어 배열로 반환  
+예측 결과를 저장할 파일 생성, 이미 존재할 경우 초기화됨 (파일 이름: `[dataset]_result.csv`)
+
 arguments: dataset(데이터셋 종류)
 
-static/dataset에 있는 모든 데이터의 리스트를 랜덤으로 순서를 섞어 배열로 반환
+**Request 예시**
+
+```
+{
+    method: "get",
+    url: "http://115.145.212.100:51122/getAllData",
+    params: {
+        dataset: "lens",
+    },
+    headers: {
+        "Content-Type": "multipart/form-data",
+    }
+}
+```
 
 **Response 예시**
 
@@ -84,10 +99,37 @@ static/dataset에 있는 모든 데이터의 리스트를 랜덤으로 순서를
 
 ### 2) /predict [GET]
 
+선택된 데이터셋의 모델을 cs_flow/models에서 불러오고, img_name에 해당하는 이미지에 대해 양/불량을 판단  
+이미지 실제 label, 예측 결과, 원본 이미지, visualization 이미지를 반환  
+예측 결과를 (dataset)\_result.csv 파일에 추가
+
+**파일 예시**
+
+```
+file name, label, prediction, anomaly score
+image1.jpg, NG, NG, 3.99
+image2.jpg, NG, OK, 1.00
+...
+```
+
 arguments: model(모델 종류, CS-Flow로 고정), dataset(데이터셋 종류), img_name(이미지 이름)
 
-선택된 데이터셋의 모델을 cs_flow/models에서 불러오고, img_name에 해당하는 이미지에 대해 양/불량을 판단  
-이미지 실제 label, 예측 결과, 원본 이미지, visualization 이미지를 반환
+**Request 예시**
+
+```
+{
+    method: "get",
+    url: "http://115.145.212.100:51122/predict",
+    params: {
+        model: "CS-Flow",
+        dataset: "lens",
+        img_name: "OK/image1.jpg",
+    },
+    headers: {
+        "Content-Type": "multipart/form-data",
+    },
+}
+```
 
 **Response 예시**
 
@@ -102,9 +144,25 @@ arguments: model(모델 종류, CS-Flow로 고정), dataset(데이터셋 종류)
 
 ### 3) /getHistogram [GET]
 
+예측이 진행된 모든 데이터의 score를 이용해 histogram을 생성하고, 이를 반환
+
 arguments: dataset(데이터셋 종류)
 
-예측이 진행된 모든 데이터의 score를 이용해 histogram을 생성하고, 이를 반환
+**Request 예시**
+
+```
+{
+    method: "get",
+    url: "http://115.145.212.100:51122/getHistogram",
+    params: {
+        model: model,
+        dataset: dataset,
+    },
+    headers: {
+        "Content-Type": "multipart/form-data",
+    },
+}
+```
 
 **Response 예시**
 
