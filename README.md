@@ -28,7 +28,7 @@ $ pip install -r requirements.txt
 **To run Flask:**
 
 ```
-$ python app.py
+$ sudo python app.py
 ```
 
 ## 파일 구조
@@ -155,7 +155,6 @@ arguments: dataset(데이터셋 종류)
     method: "get",
     url: "http://115.145.212.100:51122/getHistogram",
     params: {
-        model: model,
         dataset: dataset,
     },
     headers: {
