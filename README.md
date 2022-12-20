@@ -79,7 +79,7 @@ arguments: dataset(데이터셋 종류)
 ```
 {
     method: "get",
-    url: "http://115.145.212.100:51122/getAllData",
+    url: "http://[서버주소]:[포트번호]/getAllData",
     params: {
         dataset: "lens",
     },
@@ -119,7 +119,7 @@ arguments: model(모델 종류, CS-Flow로 고정), dataset(데이터셋 종류)
 ```
 {
     method: "get",
-    url: "http://115.145.212.100:51122/predict",
+    url: "http://[서버주소]:[포트번호]/predict",
     params: {
         model: "CS-Flow",
         dataset: "lens",
@@ -153,7 +153,7 @@ arguments: dataset(데이터셋 종류)
 ```
 {
     method: "get",
-    url: "http://115.145.212.100:51122/getHistogram",
+    url: "http://[서버주소]:[포트번호]/getHistogram",
     params: {
         dataset: dataset,
     },
