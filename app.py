@@ -5,6 +5,7 @@ import time
 import math
 import json
 import random
+import csv
 
 from flask import Flask, make_response, request, jsonify, send_file
 from flask_cors import CORS, cross_origin
@@ -33,8 +34,15 @@ def getAllData():
     scores = []
     classes = []
 
-    # 데이터셋 종류
+    # argument(데이터셋 종류)
     dataset = request.args.get('dataset')
+
+    # 결과 저장 파일 생성
+    f = open(dataset + '_result.csv', 'w')
+    wr = csv.writer(f)
+    wr.writerow(["file name", "label", "prediction", "anomaly score"])
+    f.close()
+
     # 데이터셋 디렉토리
     root_dir = '/home/synapse/simulator/backend/static/' + dataset  
 
@@ -63,6 +71,7 @@ def getAllData():
 @api.route('/getHistogram', methods=['GET'])
 def getHistogram():
 
+    # argument(데이터셋 종류)
     dataset = request.args.get('dataset')
 
     compare_histogram(scores, classes, dataset)
@@ -92,6 +101,10 @@ def predict():
     dataset = request.args.get('dataset')  # module / lens / flex
     img_name = request.args.get('img_name')
 
+    # 예측 결과 저장 파일 로드
+    f = open(dataset + '_result.csv', 'a')
+    wr = csv.writer(f)
+
     # 이미지 경로
     user_img_path = '/home/synapse/simulator/backend/static/' + dataset + "/" + img_name
 
@@ -116,6 +129,13 @@ def predict():
         else:
             response["label"] = "NG"
             classes.append(1)
+
+        # 예측 결과를 파일에 저장
+        if response['isAnomaly'] is True:
+            wr.writerow([img_name[3:], response["label"], "NG", response["anomaly_score"]])
+        else:
+            wr.writerow([img_name[3:], response["label"], "OK", response["anomaly_score"]])
+        f.close()
 
         # 원본 이미지 인코딩
         with open(user_img_path, "rb") as f:
